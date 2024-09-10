@@ -1,0 +1,3 @@
+streamlit
+numpy
+scikit-learn  # if you're using scikit-learn for your model
