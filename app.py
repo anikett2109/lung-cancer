@@ -8,7 +8,7 @@ with open(model_path, 'rb') as file:
     model = pickle.load(file)
 
 # Streamlit UI
-st.title("Lung Cancer Prediction")
+st.title("Lung Cancer Prediction and Treatment Recommendation")
 
 # Inputs from user
 gender = st.selectbox("Gender", ["Male", "Female"])
@@ -34,6 +34,21 @@ gender_num = gender_mapping.get(gender, -1)
 # Prepare features array
 features = np.array([[gender_num, age, smoking, yellow_fingers, anxiety, peer_pressure, chronic_disease, fatigue, allergy, wheezing, alcohol_consuming, coughing, shortness_of_breath, swallowing_difficulty, chest_pain]])
 
+# Function to provide treatment recommendation
+def treatment_recommendation(prediction, features):
+    if prediction == 1:
+        treatment = "Recommendation: Consult with an oncologist for further diagnosis and potential treatments such as chemotherapy, radiation therapy, or surgery."
+        if smoking == 1:
+            treatment += "\n- Smoking cessation is highly recommended."
+        if chronic_disease == 1:
+            treatment += "\n- Manage underlying chronic conditions to improve overall health."
+        if chest_pain == 1 or shortness_of_breath == 1:
+            treatment += "\n- Immediate medical attention for symptoms like chest pain and shortness of breath is advised."
+    else:
+        treatment = "No lung cancer detected. However, maintaining a healthy lifestyle, avoiding smoking, and regular check-ups are advised."
+
+    return treatment
+
 # Predict button
 if st.button('Predict'):
     if gender_num == -1:
@@ -42,3 +57,7 @@ if st.button('Predict'):
         prediction = model.predict(features)
         result = "YES" if prediction[0] == 1 else "NO"
         st.write(f"Prediction: Lung Cancer {'Detected' if result == 'YES' else 'Not Detected'}")
+        
+        # Get treatment recommendation based on prediction
+        recommendation = treatment_recommendation(prediction[0], features)
+        st.write(recommendation)
